@@ -18,6 +18,7 @@ public class TicTacToe {
     boolean isPlayer1Move;
     boolean isGameOver;
     byte turnCount;
+    byte gamesPlayed;
 
     //action listeners  -->
     ActionListener buttonsActionListener = e -> {
@@ -25,42 +26,22 @@ public class TicTacToe {
         for (JButton button : buttons) {
             //find out if this button was clicked  -->
             if (e.getSource() == button) {
-                //X turn    -->
                 if (isPlayer1Move) {
-                    if (button.getText().isEmpty()) {
-                        button.setText("X");
-                        button.setForeground(new Color(200, 0, 0));
-                        isPlayer1Move = false;
-                        turnCount++;
-                        infoPanelTextField.setText("\"O\" turn");
-                        infoPanelTextField.setForeground(new Color(0, 0, 200));
-                        checkWinningConditionsX();
-                    }
+                    makePlayer1Move(button);
+                } else {
+                    makePlayer2Move(button);
                 }
-                //O turn    -->
-                else /*if (!isPlayer1Move)*/ {
-                    if (button.getText().isEmpty()) {
-                        button.setText("O");
-                        button.setForeground(new Color(0, 0, 200));
-                        isPlayer1Move = true;
-                        turnCount++;
-                        infoPanelTextField.setText("\"X\" turn");
-                        infoPanelTextField.setForeground(new Color(200, 0, 0));
-                        checkWinningConditionsO();
-                    }
-                }
-
 
                 //draw conditions   -->
                 if (turnCount == 9 && !isGameOver) {
-                    draw();
+                    declareDraw();
                 }
             }
         }
     };
     ActionListener restartButtonActionListener = e -> {
         if (e.getSource() == restartButton) {
-            start();
+            startNewGame();
         }
     };
 
@@ -110,6 +91,7 @@ public class TicTacToe {
         restartButton.setFont(new Font("Algerian", Font.ITALIC, 50));
         restartButton.setFocusable(false);
         restartButton.addActionListener(restartButtonActionListener);
+        restartButton.setVisible(false);
 
 
         //adding components to the frame    -->
@@ -123,19 +105,13 @@ public class TicTacToe {
         frame.setVisible(true);
 
 
-        start();
+        startNewGame();
     }
 
-    private void start() {
-        //reset the game    -->
-        restartButton.setVisible(false);
-        for (JButton button : buttons) {
-            button.setText("");
-            button.setBackground(new Color(225, 225, 225));
-            button.setEnabled(true);
+    private void startNewGame() {
+        if (gamesPlayed != 0) {
+            resetGame();
         }
-        isGameOver = false;
-        turnCount = 0;
 
         //decide who goes first   -->
         if (random.nextInt(2) == 0) {
@@ -149,104 +125,158 @@ public class TicTacToe {
         }
     }
 
+    private void makePlayer1Move(JButton button) {
+        if (button.getText().isEmpty()) {
+            button.setText("X");
+            button.setForeground(new Color(200, 0, 0));
+            isPlayer1Move = false;
+            turnCount++;
+            infoPanelTextField.setText("\"O\" turn");
+            infoPanelTextField.setForeground(new Color(0, 0, 200));
+            checkWinningConditionsX();
+        }
+    }
+
+    private void makePlayer2Move(JButton button) {
+        if (button.getText().isEmpty()) {
+            button.setText("O");
+            button.setForeground(new Color(0, 0, 200));
+            isPlayer1Move = true;
+            turnCount++;
+            infoPanelTextField.setText("\"X\" turn");
+            infoPanelTextField.setForeground(new Color(200, 0, 0));
+            checkWinningConditionsO();
+        }
+    }
+
     private void checkWinningConditionsX() {
         //horizontal    -->
         if (buttons[0].getText().equals("X") && buttons[1].getText().equals("X") && buttons[2].getText().equals("X")) {
-            victoryX(0, 1, 2);
+            declareVictoryX(0, 1, 2);
         }
         if (buttons[3].getText().equals("X") && buttons[4].getText().equals("X") && buttons[5].getText().equals("X")) {
-            victoryX(3, 4, 5);
+            declareVictoryX(3, 4, 5);
         }
         if (buttons[6].getText().equals("X") && buttons[7].getText().equals("X") && buttons[8].getText().equals("X")) {
-            victoryX(6, 7, 8);
+            declareVictoryX(6, 7, 8);
         }
 
         //vertical  -->
         if (buttons[0].getText().equals("X") && buttons[3].getText().equals("X") && buttons[6].getText().equals("X")) {
-            victoryX(0, 3, 6);
+            declareVictoryX(0, 3, 6);
         }
         if (buttons[1].getText().equals("X") && buttons[4].getText().equals("X") && buttons[7].getText().equals("X")) {
-            victoryX(1, 4, 7);
+            declareVictoryX(1, 4, 7);
         }
         if (buttons[2].getText().equals("X") && buttons[5].getText().equals("X") && buttons[8].getText().equals("X")) {
-            victoryX(2, 5, 8);
+            declareVictoryX(2, 5, 8);
         }
 
         //diagonal  -->
         if (buttons[0].getText().equals("X") && buttons[4].getText().equals("X") && buttons[8].getText().equals("X")) {
-            victoryX(0, 4, 8);
+            declareVictoryX(0, 4, 8);
         }
         if (buttons[2].getText().equals("X") && buttons[4].getText().equals("X") && buttons[6].getText().equals("X")) {
-            victoryX(2, 4, 6);
+            declareVictoryX(2, 4, 6);
         }
     }
 
-    private void victoryX(int a, int b, int c) {
-        buttons[a].setBackground(new Color(200, 0, 0));
-        buttons[b].setBackground(new Color(200, 0, 0));
-        buttons[c].setBackground(new Color(200, 0, 0));
+    private void declareVictoryX(int a, int b, int c) {
+        //disable all buttons   -->
         for (JButton button : buttons) {
             button.setEnabled(false);
         }
+
+        //set new text on the information panel -->
         infoPanelTextField.setText("\"X\" wins!");
         infoPanelTextField.setForeground(new Color(200, 0, 0));
-        isGameOver = true;
-        restartButton.setVisible(true);
+
+        //paint all the buttons of a winning combination    -->
+        buttons[a].setBackground(new Color(200, 0, 0));
+        buttons[b].setBackground(new Color(200, 0, 0));
+        buttons[c].setBackground(new Color(200, 0, 0));
+
+        setGameOverSettings();
     }
 
     private void checkWinningConditionsO() {
         //horizontal    -->
         if (buttons[0].getText().equals("O") && buttons[1].getText().equals("O") && buttons[2].getText().equals("O")) {
-            victoryO(0, 1, 2);
+            declareVictoryO(0, 1, 2);
         }
         if (buttons[3].getText().equals("O") && buttons[4].getText().equals("O") && buttons[5].getText().equals("O")) {
-            victoryO(3, 4, 5);
+            declareVictoryO(3, 4, 5);
         }
         if (buttons[6].getText().equals("O") && buttons[7].getText().equals("O") && buttons[8].getText().equals("O")) {
-            victoryO(6, 7, 8);
+            declareVictoryO(6, 7, 8);
         }
 
         //vertical  -->
         if (buttons[0].getText().equals("O") && buttons[3].getText().equals("O") && buttons[6].getText().equals("O")) {
-            victoryO(0, 3, 6);
+            declareVictoryO(0, 3, 6);
         }
         if (buttons[1].getText().equals("O") && buttons[4].getText().equals("O") && buttons[7].getText().equals("O")) {
-            victoryO(1, 4, 7);
+            declareVictoryO(1, 4, 7);
         }
         if (buttons[2].getText().equals("O") && buttons[5].getText().equals("O") && buttons[8].getText().equals("O")) {
-            victoryO(2, 5, 8);
+            declareVictoryO(2, 5, 8);
         }
 
         //diagonal  -->
         if (buttons[0].getText().equals("O") && buttons[4].getText().equals("O") && buttons[8].getText().equals("O")) {
-            victoryO(0, 4, 8);
+            declareVictoryO(0, 4, 8);
         }
         if (buttons[2].getText().equals("O") && buttons[4].getText().equals("O") && buttons[6].getText().equals("O")) {
-            victoryO(2, 4, 6);
+            declareVictoryO(2, 4, 6);
         }
     }
 
-    private void victoryO(int a, int b, int c) {
+    private void declareVictoryO(int a, int b, int c) {
+        //disable all buttons   -->
+        for (JButton button : buttons) {
+            button.setEnabled(false);
+        }
+
+        //set new text on the information panel -->
+        infoPanelTextField.setText("\"O\" wins!");
+        infoPanelTextField.setForeground(new Color(0, 0, 200));
+
+        //paint all the buttons of a winning combination    -->
         buttons[a].setBackground(new Color(0, 0, 200));
         buttons[b].setBackground(new Color(0, 0, 200));
         buttons[c].setBackground(new Color(0, 0, 200));
+
+        setGameOverSettings();
+    }
+
+    private void declareDraw() {
+        //disable all buttons   -->
         for (JButton button : buttons) {
             button.setEnabled(false);
         }
-        infoPanelTextField.setText("\"O\" wins!");
-        infoPanelTextField.setForeground(new Color(0, 0, 200));
+
+        //set new text on the information panel -->
+        infoPanelTextField.setText("Draw!");
+        infoPanelTextField.setForeground(new Color(200, 200, 200));
+
+        setGameOverSettings();
+    }
+
+    private void setGameOverSettings() {
         isGameOver = true;
+        gamesPlayed++;
         restartButton.setVisible(true);
     }
 
-    private void draw() {
+    private void resetGame() {
         for (JButton button : buttons) {
-            button.setEnabled(false);
+            button.setText("");
+            button.setBackground(new Color(225, 225, 225));
+            button.setEnabled(true);
         }
-        infoPanelTextField.setText("Draw!");
-        infoPanelTextField.setForeground(new Color(200, 200, 200));
-        isGameOver = true;
-        restartButton.setVisible(true);
+        isGameOver = false;
+        turnCount = 0;
+        restartButton.setVisible(false);
     }
 
 }
