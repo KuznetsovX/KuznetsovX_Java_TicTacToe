@@ -8,46 +8,18 @@ import java.util.Random;
 public class TicTacToe {
 
     //components    -->
-    JFrame frame = new JFrame();
-    JPanel infoPanel = new JPanel();
-    JLabel infoPanelTextField = new JLabel();
-    JPanel buttonPanel = new JPanel();
-    JButton[] buttons = new JButton[9];
-    JButton restartButton = new JButton();
-    Random random = new Random();
-    boolean isPlayer1Move;
-    boolean isGameOver;
-    byte turnCount;
-    byte gamesPlayed;
-
-    //action listeners  -->
-    ActionListener buttonsActionListener = e -> {
-        //search through all buttons on a button panel    -->
-        for (JButton button : buttons) {
-            //find out if this button was clicked  -->
-            if (e.getSource() == button) {
-                if (isPlayer1Move) {
-                    makePlayer1Move(button);
-                } else {
-                    makePlayer2Move(button);
-                }
-
-                //draw conditions   -->
-                if (turnCount == 9 && !isGameOver) {
-                    declareDraw();
-                }
-            }
-        }
-    };
-    ActionListener restartButtonActionListener = e -> {
-        if (e.getSource() == restartButton) {
-            startNewGame();
-        }
-    };
-
+    private final JLabel infoPanelTextField = new JLabel();
+    private final JButton[] buttons = new JButton[9];
+    private final JButton restartButton = new JButton();
+    private final Random random = new Random();
+    private boolean isPlayer1Move;
+    private boolean isGameOver;
+    private byte turnCount;
+    private byte gamesPlayed;
 
     TicTacToe() {
         //frame settings    -->
+        JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
         frame.getContentPane().setBackground(new Color(15, 15, 15));
@@ -55,6 +27,7 @@ public class TicTacToe {
 
 
         //info panel settings   -->
+        JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BorderLayout());
         infoPanel.setBounds(0, 0, 600, 100);
         infoPanel.add(infoPanelTextField);
@@ -70,11 +43,30 @@ public class TicTacToe {
 
 
         //buttons panel settings    -->
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(3, 3));
         buttonPanel.setBounds(0, 100, 600, 500);
 
 
         //buttons settings  -->
+        ActionListener buttonsActionListener = e -> {
+            //search through all buttons on a button panel    -->
+            for (JButton button : buttons) {
+                //find out if this button was clicked  -->
+                if (e.getSource() == button) {
+                    if (isPlayer1Move) {
+                        makePlayer1Move(button);
+                    } else {
+                        makePlayer2Move(button);
+                    }
+
+                    //draw conditions   -->
+                    if (turnCount == 9 && !isGameOver) {
+                        declareDraw();
+                    }
+                }
+            }
+        };
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JButton();
             buttons[i].setBackground(new Color(225, 225, 225));
@@ -86,6 +78,11 @@ public class TicTacToe {
 
 
         //restart button settings   -->
+        ActionListener restartButtonActionListener = e -> {
+            if (e.getSource() == restartButton) {
+                startNewGame();
+            }
+        };
         restartButton.setText("Restart");
         restartButton.setBackground(new Color(225, 225, 225));
         restartButton.setFont(new Font("Algerian", Font.ITALIC, 50));
