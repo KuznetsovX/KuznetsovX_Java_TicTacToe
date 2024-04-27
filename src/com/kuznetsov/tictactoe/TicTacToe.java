@@ -20,7 +20,7 @@ public class TicTacToe {
     TicTacToe() {
         //frame settings    -->
         JFrame frame = new JFrame();
-        ImageIcon image = new ImageIcon("src/com/kuznetsov/tictactoe/TicTacToeGame.png");
+        ImageIcon image = new ImageIcon("src/com/kuznetsov/tictactoe/TicTacToeIcon.png");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Tic-Tac-Toe");
         frame.setIconImage(image.getImage());
